@@ -6,6 +6,10 @@
   - [[#install][Install]]
   - [[#use][Use]]
   - [[#customise][Customise]]
+- [[#todos][TODOs]]
+  - [[#refactor-imports][Refactor imports]]
+  - [[#add-custom-build-script][Add custom build script]]
+  - [[#track-xmobarhs-within-the-readme][Track xmobar.hs within the README]]
 - [[#imports][Imports]]
 - [[#variables][Variables]]
 - [[#main][Main]]
@@ -37,7 +41,16 @@ However if you are not an emacs addict like myself just tweak the source files a
 - Change the `my*` variables in xmonad.hs to your apps/fonts/directories
 - Add some new key-bindings
 - Tweak the colour setup default is solarized
-
+* TODOs
+** TODO Refactor imports
+Refactor imports so they make more logical sense and remove old unused imports
+** TODO Add custom build script
+Add custom build script that detects if a emacs install exists with org-mode.
+If so it will run tangle so the build will by default use the README file as source of truth.
+** TODO Track xmobar.hs within the README
+Track xmobar.hs within the README so the whole configuration will be modifiable from one source of truth.
+To do this Sections such as Imports, Variables and Main will be relocated under a section for all xmonad.hs code.
+While additional sections will be added for the build script mentioned above and xmobar.hs
 * Imports
 #+BEGIN_SRC haskell
 import XMonad
