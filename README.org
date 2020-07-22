@@ -1,0 +1,136 @@
+#+TITLE: Readme
+#+PROPERTY: header-args :tangle xmonad.hs
+
+* Table of Contents :toc:
+- [[#how-to][How To]]
+  - [[#install][Install]]
+  - [[#use][Use]]
+  - [[#customise][Customise]]
+- [[#imports][Imports]]
+- [[#variables][Variables]]
+- [[#main][Main]]
+
+* How To
+** Install
+- follow xmonad and xmobar install guide for your system (https://wiki.haskell.org/Xmonad/Installing_xmonad)
+- clone this repo into $HOME/.xmonad/
+- $HOME/.config/background.jpg is the default expected location of the background
+- in xmobar.hs change eno1 occurences to whatever interface is you main outgoing interface
+** Use
+*** Key Bindings
+- WIN-[1...9] to switch between workspaces
+- WIN-Shift-[1...9] to move the active window to a workspace
+- WIN-Shift-C close current window
+- WIN-Shift-Enter open terminal
+- WIN-t sink window
+- WIN-w start chromium
+- WIN-e start emacs
+- WIN-a start audio mixer `pavucontrol`
+- WIN-r start a run prompt in xmobar
+** Customise
+The default method of customisation for this xmonad config is by modifying this README file.
+However if you are not an emacs addict like myself just tweak the source files and ignore the source code in this document.
+*** Suggested modifications
+- Changes to xmobar.hs (not tracked in the README yet)
+  - change the network interface default is eno1 you may not use this
+  - change the layout or colour scheme
+- Change the `my*` variables in xmonad.hs to your apps/fonts/directories
+- Add some new key-bindings
+- Tweak the colour setup default is solarized
+
+* Imports
+#+BEGIN_SRC haskell
+import XMonad
+import XMonad.Config.Gnome
+import XMonad.Layout.Minimize
+import qualified Data.Map as M
+import System.Exit -- exitWith
+import XMonad.Layout.Fullscreen
+import XMonad.Layout.NoBorders
+import XMonad.Layout.Gaps
+
+import XMonad.Util.Run (spawnPipe, hPutStrLn)
+import XMonad.Util.SpawnOnce
+
+import XMonad.Prompt
+import XMonad.Prompt.FuzzyMatch
+import XMonad.Prompt.Shell (shellPrompt)
+
+import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.ManageHelpers
+import XMonad.Hooks.ManageDocks
+import qualified XMonad.StackSet as W
+import Control.Monad
+import Control.Applicative
+import Data.Monoid (All (All))
+
+import XMonad.Util.EZConfig (additionalKeysP)
+#+END_SRC
+* Variables
+#+BEGIN_SRC haskell
+myFont = "xft:inconsolatalgc:pixelsize=12:antialias=true"
+
+xmobarTitleColor            = "#FFB6B0"
+xmobarCurrentWorkspaceColor = "#CEFFAC"
+
+myEditor     = "emacs -a '' -c"
+myBrowser    = "chromium"
+myAudioMixer = "pavucontrol"
+myTerminal   = "alacritty"
+myWallpaper  = "$HOME/.config/background.jpg"
+myXmobarrc   = "~/.xmonad/xmobar.hs"
+
+promptConfig :: XPConfig
+promptConfig = def
+      { font                = myFont
+      , bgColor             = "#002b36"
+      , fgColor             = "#657b83"
+      , bgHLight            = "#c792ea"
+      , fgHLight            = "#000000"
+      , borderColor         = "#535974"
+      , promptBorderWidth   = 0
+      , position            = Top
+      , height              = 20
+      , historySize         = 256
+      , historyFilter       = id
+      , defaultText         = []
+      , autoComplete        = Just 100000
+      , showCompletionOnTab = False
+      , searchPredicate     = fuzzyMatch
+      , alwaysHighlight     = True
+      , maxComplRows        = Nothing
+      }
+
+myKeys :: [(String, X ())]
+myKeys =
+  [
+    ("M-r", shellPrompt promptConfig  )
+  , ("M-e", spawn myEditor )
+  , ("M-a", spawn myAudioMixer)
+  , ("M-w", spawn myBrowser)
+  ]
+
+#+END_SRC
+* Main
+#+BEGIN_SRC haskell
+main :: IO ()
+main = do
+  spawn $ "feh --bg-scale " ++ myWallpaper
+  xmproc <- spawnPipe $ (++) "xmobar " myXmobarrc
+  xmonad $ gnomeConfig
+    { terminal    = myTerminal
+    , modMask     = mod4Mask
+    , focusFollowsMouse = False
+    , borderWidth = 2
+    , normalBorderColor  = "#888888"
+    , focusedBorderColor = "#000000"
+    , manageHook   = manageDocks <+> (isFullscreen --> doFullFloat) <+> manageHook defaultConfig --  <+> (isFullscreen --> doFullFloat)
+    , layoutHook   = smartBorders (layoutHook gnomeConfig)
+    , logHook      = dynamicLogWithPP $ xmobarPP {
+        ppOutput   = hPutStrLn xmproc
+      , ppTitle    = xmobarColor xmobarTitleColor "" . shorten 100
+      , ppCurrent  = xmobarColor xmobarCurrentWorkspaceColor ""
+      , ppSep      = "   "
+    }
+    } `additionalKeysP` myKeys
+#+END_SRC
