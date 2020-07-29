@@ -9,7 +9,8 @@ import XMonad.Layout.Gaps
 
 import XMonad.Util.Run (spawnPipe, hPutStrLn)
 import XMonad.Util.SpawnOnce
-
+import XMonad.Actions.SpawnOn
+ 
 import XMonad.Prompt
 import XMonad.Prompt.FuzzyMatch
 import XMonad.Prompt.Shell (shellPrompt)
@@ -66,6 +67,15 @@ myKeys =
   , ("M-w", spawn myBrowser)
   ]
 
+startup :: X ()
+startup = do
+  spawnOn "1" myBrowser
+  spawnOn "2" myTerminal
+  spawnOn "3" myEditor
+
+  spawnOn "8" "Discord"
+  spawnOn "9" "spotify"
+
 main :: IO ()
 main = do
   spawn $ "feh --bg-scale " ++ myWallpaper
@@ -77,7 +87,8 @@ main = do
     , borderWidth = 2
     , normalBorderColor  = "#888888"
     , focusedBorderColor = "#000000"
-    , manageHook   = manageDocks <+> (isFullscreen --> doFullFloat) <+> manageHook defaultConfig --  <+> (isFullscreen --> doFullFloat)
+    , manageHook   = manageSpawn <+> manageDocks <+> (isFullscreen --> doFullFloat) <+> manageHook defaultConfig
+    , startupHook = startup
     , layoutHook   = smartBorders (layoutHook gnomeConfig)
     , logHook      = dynamicLogWithPP $ xmobarPP {
         ppOutput   = hPutStrLn xmproc

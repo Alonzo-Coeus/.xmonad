@@ -12,6 +12,7 @@
   - [[#track-xmobarhs-within-the-readme][Track xmobar.hs within the README]]
 - [[#imports][Imports]]
 - [[#variables][Variables]]
+- [[#startup-hook][Startup Hook]]
 - [[#main][Main]]
 
 * How To
@@ -64,7 +65,8 @@ import XMonad.Layout.Gaps
 
 import XMonad.Util.Run (spawnPipe, hPutStrLn)
 import XMonad.Util.SpawnOnce
-
+import XMonad.Actions.SpawnOn
+ 
 import XMonad.Prompt
 import XMonad.Prompt.FuzzyMatch
 import XMonad.Prompt.Shell (shellPrompt)
@@ -124,6 +126,17 @@ myKeys =
   ]
 
 #+END_SRC
+* Startup Hook
+#+BEGIN_SRC haskell
+startup :: X ()
+startup = do
+  spawnOn "1" myBrowser
+  spawnOn "2" myTerminal
+  spawnOn "3" myEditor
+
+  spawnOn "8" "Discord"
+  spawnOn "9" "spotify"
+#+END_SRC
 * Main
 #+BEGIN_SRC haskell
 main :: IO ()
@@ -137,7 +150,8 @@ main = do
     , borderWidth = 2
     , normalBorderColor  = "#888888"
     , focusedBorderColor = "#000000"
-    , manageHook   = manageDocks <+> (isFullscreen --> doFullFloat) <+> manageHook defaultConfig --  <+> (isFullscreen --> doFullFloat)
+    , manageHook   = manageSpawn <+> manageDocks <+> (isFullscreen --> doFullFloat) <+> manageHook defaultConfig
+    , startupHook = startup
     , layoutHook   = smartBorders (layoutHook gnomeConfig)
     , logHook      = dynamicLogWithPP $ xmobarPP {
         ppOutput   = hPutStrLn xmproc
