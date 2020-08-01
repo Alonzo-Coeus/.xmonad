@@ -6,11 +6,12 @@ import System.Exit -- exitWith
 import XMonad.Layout.Fullscreen
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Gaps
+import XMonad.Layout.ResizableTile
 
 import XMonad.Util.Run (spawnPipe, hPutStrLn)
 import XMonad.Util.SpawnOnce
 import XMonad.Actions.SpawnOn
- 
+
 import XMonad.Prompt
 import XMonad.Prompt.FuzzyMatch
 import XMonad.Prompt.Shell (shellPrompt)
@@ -65,6 +66,8 @@ myKeys =
   , ("M-e", spawn myEditor )
   , ("M-a", spawn myAudioMixer)
   , ("M-w", spawn myBrowser)
+  , ("M-z", sendMessage Shrink)
+  , ("M-x", sendMessage Expand)
   ]
 
 startup :: X ()
@@ -89,7 +92,7 @@ main = do
     , focusedBorderColor = "#000000"
     , manageHook   = manageSpawn <+> manageDocks <+> (isFullscreen --> doFullFloat) <+> manageHook defaultConfig
     , startupHook = startup
-    , layoutHook   = smartBorders (layoutHook gnomeConfig)
+    , layoutHook = ResizableTall 1 (3/100) (1/2) []
     , logHook      = dynamicLogWithPP $ xmobarPP {
         ppOutput   = hPutStrLn xmproc
       , ppTitle    = xmobarColor xmobarTitleColor "" . shorten 100
