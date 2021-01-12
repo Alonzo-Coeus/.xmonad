@@ -6,7 +6,7 @@ import System.Exit -- exitWith
 import XMonad.Layout.Fullscreen
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Gaps
-import XMonad.Layout.ResizableTile
+import XMonad.Layout.Spiral
 
 import XMonad.Util.Run (spawnPipe, hPutStrLn)
 import XMonad.Util.SpawnOnce
@@ -92,8 +92,7 @@ main = do
     , focusedBorderColor = "#000000"
     , manageHook   = manageSpawn <+> manageDocks <+> (isFullscreen --> doFullFloat) <+> manageHook defaultConfig
     , startupHook = startup
-    , layoutHook = smartBorders (layoutHook gnomeConfig) ||| ResizableTall 1 (3/100) (1/2) []
-  --, layoutHook   = smartBorders (layoutHook gnomeConfig)
+    , layoutHook = spiral (6/7)
     , logHook      = dynamicLogWithPP $ xmobarPP {
         ppOutput   = hPutStrLn xmproc
       , ppTitle    = xmobarColor xmobarTitleColor "" . shorten 100
