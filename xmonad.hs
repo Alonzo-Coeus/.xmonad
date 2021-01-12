@@ -83,7 +83,7 @@ main :: IO ()
 main = do
   spawn $ "feh --bg-scale " ++ myWallpaper
   xmproc <- spawnPipe $ (++) "xmobar " myXmobarrc
-  xmonad $ gnomeConfig
+  xmonad $ defaultConfig
     { terminal    = myTerminal
     , modMask     = mod4Mask
     , focusFollowsMouse = False
@@ -92,11 +92,13 @@ main = do
     , focusedBorderColor = "#000000"
     , manageHook   = manageSpawn <+> manageDocks <+> (isFullscreen --> doFullFloat) <+> manageHook defaultConfig
     , startupHook = startup
-    , layoutHook = spiral (6/7)
-    , logHook      = dynamicLogWithPP $ xmobarPP {
-        ppOutput   = hPutStrLn xmproc
-      , ppTitle    = xmobarColor xmobarTitleColor "" . shorten 100
-      , ppCurrent  = xmobarColor xmobarCurrentWorkspaceColor ""
-      , ppSep      = "   "
-    }
+    , handleEventHook = handleEventHook defaultConfig <+> docksEventHook
+    , layoutHook = avoidStruts (spiral (6/7))
+    , logHook = dynamicLogWithPP $ def { ppOutput = hPutStrLn xmproc }
+ --   , logHook      = dynamicLogWithPP $ xmobarPP {
+ --       ppOutput   = hPutStrLn xmproc
+ --     , ppTitle    = xmobarColor xmobarTitleColor "" . shorten 100
+ --     , ppCurrent  = xmobarColor xmobarCurrentWorkspaceColor ""
+ --     , ppSep      = "   "
+ --   }
     } `additionalKeysP` myKeys
