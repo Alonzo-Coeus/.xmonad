@@ -59,7 +59,6 @@ import XMonad.Config.Gnome
 import XMonad.Layout.Minimize
 import qualified Data.Map as M
 import System.Exit -- exitWith
-import XMonad.Layout.Fullscreen
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Gaps
 import XMonad.Layout.Spiral
@@ -75,6 +74,7 @@ import XMonad.Prompt.Shell (shellPrompt)
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.EwmhDesktops
 import qualified XMonad.StackSet as W
 import Control.Monad
 import Control.Applicative
@@ -147,26 +147,22 @@ main :: IO ()
 main = do
   spawn $ "feh --bg-scale " ++ myWallpaper
   xmproc <- spawnPipe $ (++) "xmobar " myXmobarrc
-  xmonad $ defaultConfig
+  xmonad $ ewmh def
     { terminal    = myTerminal
     , modMask     = mod4Mask
     , focusFollowsMouse = False
     , borderWidth = 2
     , normalBorderColor  = "#888888"
     , focusedBorderColor = "#000000"
-    , manageHook   = manageSpawn <+> manageDocks <+> (isFullscreen --> doFullFloat) <+> manageHook defaultConfig
+    , manageHook   = manageSpawn <+> manageDocks <+> manageHook def
     , startupHook = startup
-    , handleEventHook = handleEventHook defaultConfig <+> docksEventHook
+    , handleEventHook = handleEventHook def <+> docksEventHook <+> fullscreenEventHook
     , layoutHook = avoidStruts (spiral (6/7))
-    , logHook = dynamicLogWithPP $ def { ppOutput = hPutStrLn xmproc }
- --   , logHook      = dynamicLogWithPP $ xmobarPP {
- --       ppOutput   = hPutStrLn xmproc
- --     , ppTitle    = xmobarColor xmobarTitleColor "" . shorten 100
- --     , ppCurrent  = xmobarColor xmobarCurrentWorkspaceColor ""
- --     , ppSep      = "   "
- --   }
+    , logHook = dynamicLogWithPP $ def {
+          ppOutput   = hPutStrLn xmproc
+        , ppTitle    = xmobarColor xmobarTitleColor "" . shorten 100
+        , ppCurrent  = xmobarColor xmobarCurrentWorkspaceColor ""
+        , ppSep      = "   "
+      }
     } `additionalKeysP` myKeys
 #+END_SRC
-
-#+RESULTS:
-: <interactive>:92:5: error: parse error on input ‘}’
