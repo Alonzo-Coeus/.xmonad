@@ -14,6 +14,7 @@ import XMonad.Actions.SpawnOn
 import XMonad.Prompt
 import XMonad.Prompt.FuzzyMatch
 import XMonad.Prompt.Shell (shellPrompt)
+import XMonad.Prompt.Ssh (sshPrompt)
 
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageHelpers
@@ -62,7 +63,8 @@ promptConfig = def
 myKeys :: [(String, X ())]
 myKeys =
   [
-    ("M-r", shellPrompt promptConfig  )
+    ("M-r", shellPrompt promptConfig)
+  , ("M-s", sshPrompt   promptConfig)
   , ("M-e", spawn myEditor )
   , ("M-a", spawn myAudioMixer)
   , ("M-w", spawn myBrowser)
